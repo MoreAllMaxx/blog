@@ -1,0 +1,65 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="{% url 'home' %}">Awesome blog</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+
+    {% if user.is_authenticated %}
+        {% if user_profile %}
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'add-post' %}">Add post</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'add-category' %}">Add category</a>
+                    </li>
+                    {% if cat_menu %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="{% url 'categories' %}" id="navbarDropdown"
+                               role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Categories
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                {% for category in cat_menu %}
+                                    <a class="dropdown-item"
+                                       href="{% url 'category' category %}">{{ category|title }}</a>
+                                {% endfor %}
+                            </div>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        {% endif %}
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ml-auto">
+                {% if not user_profile %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'create-profile-page' %}">Create Profile</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'show-profile-page' user_profile.user_id %}">My Profile</a>
+                    </li>
+                {% endif %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                </li>
+            </ul>
+        </div>
+    {% else %}
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'register' %}">Register</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'login' %}">Login</a>
+                </li>
+            </ul>
+        </div>
+    {% endif %}
+</nav>

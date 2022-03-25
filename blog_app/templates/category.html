@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    {{ category|title }} Category
+{% endblock %}
+
+{% block content %}
+    <br>
+    {% if category_posts %}
+        <h1>{{ category|title }} Category</h1>
+        <br>
+        <div class="list-group">
+            {% for post in category_posts %}
+                <a href="{% url 'article-detail' post.pk %}" class="list-group-item list-group-item-action flex-column align-items-start">
+                    <div class="d-flex w-100 justify-content-between">
+                    {{ post.title }} - {{ post.author.first_name }} {{ post.author.last_name }} -
+                    {{ post.post_date }} - {{ post.category }}
+                    </div>
+                    <p>
+                    {% if post.body|length > 200 %}
+                        {{ post.body|safe|slice:200 }}...
+                    {% else %}
+                        {{ post.body|safe }}
+                    {% endif %}
+                    </p>
+                </a>
+            {% endfor %}
+            <a href="{% url 'categories' %}" class="list-group-item list-group-item-action flex-column align-items-start active">
+            All Categories
+            </a>
+        </div>
+    {% else %}
+        Sorry, that page does not exist.
+    {% endif %}
+
+{% endblock %}

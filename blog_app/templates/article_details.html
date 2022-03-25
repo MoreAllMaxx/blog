@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    Awesome blog - {{ post.title_tag }}
+{% endblock %}
+{% block content %}
+    <div class="card text-center p-2">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="post-tab" data-toggle="tab" href="#post" role="tab" aria-controls="post"
+                   aria-selected="true">Post</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="profile-tab" data-toggle="tab" href="#author" role="tab" aria-controls="author"
+                   aria-selected="false">Author</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="comments-tab" data-toggle="tab" href="#comments" role="tab"
+                   aria-controls="comments" aria-selected="false">Comments {{ post.comments.total_comments }}</a>
+            </li>
+        </ul>
+        <div class="tab-content" id="nav-tabContent">
+            <div class="tab-pane fade show active" id="post" role="tabpanel" aria-labelledby="post-tab">
+                <br>
+                <h1>Post:</h1>
+                <div class="card-body">
+                    <div class="row g-0">
+                        <div class="col-md-3">
+                            {% if post.header_image %}
+                                <img class="card-img-top" src="{{ post.header_image.url }}"
+                                     alt="{{ post.header_image.url }}">
+                            {% else %}
+                                <img class="card-img-top" src="{% static 'images/default_post.svg' %}">
+                            {% endif %}
+                            <br><br>
+                            {% if user.is_authenticated %}
+                                <form action="{% url 'like-post' post.pk %}" method="post">
+                                    {% csrf_token %}
+                                    {% if liked %}
+                                        <button type="submit" name="post_id" value="{{ post.id }}"
+                                                class="btn btn-danger btn-sm">Unlike
+                                        </button>
+                                        - Total likes: {{ total_likes }}
+                                    {% else %}
+                                        <button type="submit" name="post_id" value="{{ post.id }}"
+                                                class="btn btn-primary btn-sm">Like
+                                        </button>
+                                        - Total likes: {{ total_likes }}
+                                    {% endif %}
+                                </form>
+                            {% else %}
+                                <a href="{% url 'login' %}" class="btn btn-primary btn-sm">Login to Like The
+                                    Post</a>
+                            {% endif %}
+                            <br>
+                        </div>
+                        <div class="col-md-9">
+                            <div class="card">
+                                <div class="card-header text-left">
+                                    <h4><strong style="display: inline;">{{ post.title }}</strong></h4>
+                                    <p style="margin: 0">
+                                        Category:
+                                        <a href="{% url 'category' post.category|slugify %}">{{ post.category }}</a>
+                                        - By: {{ post.author.first_name }} {{ post.author.last_name }} -
+                                        Date: {{ post.post_date }}
+                                        {% if user_profile and user.id == post.author.id %}
+                                            <small>
+                                                <a href="{% url 'update-post' post.pk %}">(Edit post)</a>
+                                                <a href="{% url 'delete-post' post.pk %}">(Delete post)</a>
+                                            </small>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                <div class="card-text text-left p-3">
+                                    {{ post.body|safe }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="author" role="tabpanel" aria-labelledby="author-tab">
+                <br>
+                <h1>Author:</h1>
+                <br>
+                <div class="card mb-3">
+                    <div class="row g-0">
+                        <div class="col-md-2">
+                            {% if post.author.profile.profile_pic %}
+                                <img src="{{ post.author.profile.profile_pic.url }}"
+                                     class="img-fluid img-thumbnail rounded-start max-width:200 float-start">
+                            {% else %}
+                                <img src="{% static 'images/default_avatar.png' %}"
+                                     class="img-fluid img-thumbnail rounded-start max-width:200 float-start">
+                            {% endif %}
+                        </div>
+                        <div class="col-md-10">
+                            <div class="card-body">
+                                <a href="{% url 'show-profile-page' post.author.profile.id %}">
+                                    <h5 class="card-text">{{ post.author.first_name }} {{ post.author.last_name }}</h5>
+                                </a>
+                                {% if url_list %}
+                                    <small class="card-text">{{ url_list|safeseq|join:" | " }}</small>
+                                    <br>
+                                {% endif %}
+                                <br>
+                                <p class="card-text">{{ post.author.profile.bio }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="comments" role="tabpanel" aria-labelledby="comments-tab">
+                <br>
+                <h1>Comments:</h1>
+                {% if not post.comments.all %}
+                    <p class="text-left pl-2">No comments yet...</p>
+                {% else %}
+                    {% for comment in post.comments.all %}
+                        <hr>
+                        <p class="text-left pl-2">
+                            <strong>{{ comment.name }} - {{ comment.date_added|date:"d-m-Y H:i:s" }}</strong>
+                        </p>
+                        <p class="text-left pl-2">{{ comment.text }}</p>
+                    {% endfor %}
+                {% endif %}
+                <hr>
+                <p class="text-left pl-2"><strong>Add comment:</strong></p>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ comments_form.as_p }}
+                    <button type="submit" class="btn btn-secondary">Add Comment</button>
+                </form>
+                <br>
+            </div>
+        </div>
+
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    Awesome blog
+{% endblock %}
+
+{% block content %}
+
+    <h1>Posts</h1>
+    {% for post in posts %}
+        {% if forloop.counter == 0 or forloop.counter|add:'-1'|divisibleby:5 %}
+            <div class="container-xxl">
+                <div class="row row-cols-md-6">
+        {% endif %}
+    <div class="card m-3">
+        <a href="{% url 'article-detail' post.id %}">
+            {% if post.header_image %}
+                <img class="card-img-top" src="{{ post.header_image.url }}"
+                     alt="Card image cap">
+            {% else %}
+                <img class="card-img-top" src="{% static 'images/default_post.svg' %}">
+            {% endif %}
+        </a>
+        <div class="card-header">
+            <p class="card-text"><a href="{% url 'article-detail' post.pk %}">{{ post.title }}</a></p>
+        </div>
+
+        <div class="card-body">
+            <p>
+                <small>By:
+                    <a href="{% url 'show-profile-page' post.author.profile.id %}">
+                        {{ post.author.first_name }} {{ post.author.last_name }}</a>
+                </small>
+            </p>
+            <p>
+                <small>
+                    Category: <a href="{% url 'category' post.category|slugify %}">{{ post.category }}</a>
+                </small>
+            </p>
+            <br>
+            <p class="card-text">
+                {% if post.body|length > 20 %}
+                    {{ post.snippet }}
+                {% else %}
+                    {{ post.body|safe }}
+                {% endif %}
+            </p>
+            {% if user_profile and user.id == post.author.id %}
+                <br>
+                <small>
+                    <a href="{% url 'update-post' post.pk %}">(Edit post)</a>
+                    <a href="{% url 'delete-post' post.pk %}">(Delete post)</a>
+                </small>
+            {% endif %}
+        </div>
+        <div class="card-footer">
+            <small class="text-muted">{{ post.post_date }}</small>
+        </div>
+    </div>
+    {% if forloop.counter|divisibleby:5 %}
+            </div>
+        </div>
+    {% endif %}
+    {% empty %}
+        <p>No posts yet</p>
+        {% if user_profile %}
+            <a href="{% url 'add-post' %}">Create one</a>
+        {% endif %}
+    {% endfor %}
+
+    <style>
+        p {
+            margin: 0;
+            line-height: 1.2;
+        }
+    </style>
+{% endblock %}

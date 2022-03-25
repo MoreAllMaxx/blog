@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    User Profile - {{ page_user.user.username }}
+{% endblock %}
+{% block content %}
+    <h1>{{ page_user.user.username }}</h1>
+    <br>
+    <div class="card mb-3">
+        <div class="row g-0">
+            <div class="col-md-2">
+                {% if page_user.profile_pic %}
+                    <img src="{{ page_user.profile_pic.url }}" class="img-fluid img-thumbnail rounded-start max-width:200 float-start">
+                {% else %}
+                    <img src="{% static 'images/default_avatar.png' %}" class="img-fluid img-thumbnail rounded-start max-width:200 float-start">
+                {% endif %}
+            </div>
+            <div class="col-md-10">
+                <div class="card-body">
+                    <h5 class="card-text">{{ page_user.user.first_name }} {{ page_user.user.last_name }}</h5>
+                    <small class="card-text">{{ url_list|safeseq|join:" | " }}</small>
+                    <br>
+                    <p class="card-text">{{ page_user.bio }}</p>
+                </div>
+            </div>
+        </div>
+        {% if page_user.user_id == request.user.id %}
+        <button class="btn btn-light">
+            <a class="nav-link" href="{% url 'edit-profile-page' page_user.id %}">Edit Profile Page</a>
+        </button>
+        {% endif %}
+    </div>
+{% endblock %}
