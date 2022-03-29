@@ -1,4 +1,4 @@
-The Blog by Maxim Dontsov.
+The Blog (EN) by Maxim Dontsov.
 
 Do the following to run the application:
 
